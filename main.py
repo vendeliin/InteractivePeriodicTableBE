@@ -40,9 +40,10 @@ def get_db():
         db.close()
 
 @app.get("/get/all")
-def get_all(db: Session = Depends(get_db)):
+def get_all():
     file = open("elements.json")
     return json.load(file)
+
 # @app.get("/get/{id}")
 # async def getElementById(id: int, db: Session = Depends(get_db)):
 #     return db.query(models.Element).filter(models.Element.id == id).first()
