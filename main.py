@@ -1,11 +1,34 @@
+import csv
+import json
+
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel, Field
+from starlette.middleware.cors import CORSMiddleware
+
 import models
 from models import Element
+from fastapi.responses import JSONResponse
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    "http://localhost:5173/",
+    "http://127.0.0.1:5173/",
+    "127.0.0.1:49922"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 models.Base.metadata.create_all(engine)
 
@@ -18,12 +41,11 @@ def get_db():
 
 @app.get("/get/all")
 def get_all(db: Session = Depends(get_db)):
-    return db.query(models.Element).all()
-
-
-@app.get("/get/{id}")
-async def getElementById(id: int, db: Session = Depends(get_db)):
-    return db.query(models.Element).filter(models.Element.id == id).first()
+    file = open("elements.json")
+    return json.load(file)
+# @app.get("/get/{id}")
+# async def getElementById(id: int, db: Session = Depends(get_db)):
+#     return db.query(models.Element).filter(models.Element.id == id).first()
 
 # @app.post("/post/all")
 # def load_csv(db: Session = Depends(get_db)):
